@@ -1,0 +1,101 @@
+@import url("https://fonts.googleapis.com/css2?family=Fredoka:wght@300..700&display=swap");
+@import "tailwindcss";
+
+
+
+
+
+
+:root {
+  /* Light theme */
+  --color-bg-primary: #f8fafc;
+  --color-bg-secondary: #f1f5f9;
+  --color-bg-tertiary: #e2e8f0;
+  --color-text-primary: #1e293b;
+  --color-text-secondary: #475569;
+  --color-accent: #2563eb;
+  --color-accent-hover: #1d4ed8;
+  --color-border: #cbd5e1;
+  --color-button-text: #ffffff;
+  
+  /* Gradients */
+  --sidebar-gradient: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  --button-gradient: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+  --button-hover-gradient: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%);
+  --card-gradient: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+}
+
+[data-theme="dark"] {
+  --color-bg-primary: #0f172a;
+  --color-bg-secondary: #1e293b;
+  --color-bg-tertiary: #334155;
+  --color-text-primary: #f8fafc;
+  --color-text-secondary: #cbd5e1;
+  --color-accent: #3b82f6;
+  --color-accent-hover: #60a5fa;
+  --color-border: #475569;
+  --color-button-text: #ffffff;
+  
+  /* Dark theme gradients */
+  --sidebar-gradient: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+  --button-gradient: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  --button-hover-gradient: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+  --card-gradient: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+}
+
+body {
+  font-family: "Fredoka", sans-serif;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.5;
+  background-color: var(--color-bg-primary);
+  color: var(--color-text-primary);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Custom scrollbar */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 10px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.5);
+}
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+.animate-slideUp {
+  animation: slideUp 0.2s ease-out;
+}
+.animate-fadeIn {
+  animation: fadeIn 0.15s ease-out;
+}
+
+
+::-webkit-scrollbar{
+  display: none;
+}
