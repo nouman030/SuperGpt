@@ -12,9 +12,38 @@ const AppcontextProvider = ({ children }) => {
   useEffect(() => {
     // Simulate API call to fetch user data
     const fetchUser = async () => {
-      setUser(dummyUserData);
-      setLoading(false);
-    };
+      const token = localStorage.getItem('token');
+      if (!token) {
+        setLoading(false);
+        return;
+      }
+
+      try {
+        const response = await fetch('http://localhost:3000/api/user', {
+          headers: {
+            Authorization: token,
+          },
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          if (data.Success) {
+            setUser(data.user);
+          } else {
+            setUser(null);
+            localStorage.removeItem('token');
+          }
+        } else {
+          setUser(null);
+          localStorage.removeItem('token');
+        }
+      } catch (error) {
+        console.error('Failed to fetch user:', error);
+        setUser(null);
+      } finally {
+        setLoading(false);
+      }
+    };  
 
     fetchUser();
   }, []);

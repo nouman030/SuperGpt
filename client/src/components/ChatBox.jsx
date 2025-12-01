@@ -202,14 +202,14 @@ function ChatBox() {
         <div className="max-w-4xl mx-auto">
           <form 
             onSubmit={handleSubmit} 
-            className="flex items-center gap-2 p-2 rounded-full shadow-lg border backdrop-blur-md transition-all duration-300 focus-within:shadow-xl focus-within:border-[var(--color-accent)]"
+            className="flex items-center gap-2 pl-4 pr-2 py-2 rounded-full shadow-lg border backdrop-blur-md transition-all duration-300 focus-within:shadow-xl focus-within:border-[var(--color-accent)]"
             style={{ 
               backgroundColor: 'var(--color-bg-secondary)',
               borderColor: 'var(--color-border)'
             }}
           >
             {/* Text Dropdown (Visual) */}
-            <div className="hidden md:flex items-center gap-1 px-4 py-2 border-r border-[var(--color-border)] text-(--color-text-secondary) cursor-pointer hover:text-(--color-text-primary) transition-colors">
+            <div className="hidden md:flex items-center gap-1 pr-4 border-r border-[var(--color-border)] text-(--color-text-secondary) cursor-pointer hover:text-(--color-text-primary) transition-colors">
               <span className="text-sm font-medium">Text</span>
               <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
             </div>
@@ -219,10 +219,10 @@ function ChatBox() {
               value={inputValue}
               onChange={handleInputChange}
               placeholder="Type your prompt here..."
-              className="flex-1 px-4 py-3 bg-transparent text-(--color-text-primary) placeholder-gray-400 focus:outline-none text-base"
+              className="flex-1 bg-transparent text-(--color-text-primary) placeholder-gray-400 focus:outline-none text-base py-2"
             />
             
-            <div className="flex items-center gap-1 pr-2">
+            <div className="flex items-center gap-1">
               <button
                 type="button"
                 className="p-2 rounded-full hover:bg-(--color-bg-tertiary) text-(--color-text-secondary) transition-colors"

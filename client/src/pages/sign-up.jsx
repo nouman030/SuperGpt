@@ -3,7 +3,7 @@ import Form from "../components/signup-form";
 
 function SignUp() {
   return (
-    <div className="flex justify-center items-center min-h-screen">
+    <div className="flex w-full justify-center items-center min-h-screen">
       <Form />
     </div>
   );

@@ -31,6 +31,8 @@ const LoginForm = () => {
   const [password, setPassword] = useState('');
   const [emailError, setEmailError] = useState('');
   const [passwordError, setPasswordError] = useState('');
+  const [apiError, setApiError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
   const validateEmail = (email) => {
     const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -55,16 +57,19 @@ const LoginForm = () => {
     const newEmail = e.target.value;
     setEmail(newEmail);
     setEmailError(validateEmail(newEmail));
+    setApiError(''); // Clear API error on input change
   };
 
   const handlePasswordChange = (e) => {
     const newPassword = e.target.value;
     setPassword(newPassword);
     setPasswordError(validatePassword(newPassword));
+    setApiError(''); // Clear API error on input change
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setApiError(''); // Clear previous API errors
 
     const emailValidation = validateEmail(email);
     const passwordValidation = validatePassword(password);
@@ -72,12 +77,37 @@ const LoginForm = () => {
     setEmailError(emailValidation);
     setPasswordError(passwordValidation);
 
-    if (!emailValidation && !passwordValidation) {
-      // Proceed with login logic
-      console.log('Login successful with:', { email, password });
-      // Example: call an authentication API
-    } else {
-      console.log('Form has errors.');
+    if (emailValidation || passwordValidation) {
+      console.log('Form has client-side errors.');
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const response = await fetch('http://localhost:3000/api/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.Success) {
+        console.log('User logged in:', data);
+        localStorage.setItem('token', data.token);
+        // Optional: Redirect after a delay
+        setTimeout(() => window.location.href = '/', 2000);
+      } else {
+        console.error('Login failed:', data.message);
+        setApiError(data.message || 'Login failed. Please try again.');
+      }
+    } catch (error) {
+      console.error('Error during login:', error);
+      setApiError('Network error or server is unreachable.');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -108,11 +138,13 @@ const LoginForm = () => {
           onChange={handlePasswordChange}
           error={passwordError}
         />
+        {apiError && <p className="text-red-500 text-xs mt-1 text-center">{apiError}</p>}
         <button
           type="submit"
-          className="border-none outline-none bg-[var(--color-accent)] p-3 rounded-[12px] text-white text-lg font-medium hover:bg-[var(--color-accent-hover)] transition-colors duration-300 cursor-pointer mt-2"
+          className="border-none outline-none bg-[var(--color-accent)] p-3 rounded-[12px] text-white text-lg font-medium hover:bg-[var(--color-accent-hover)] transition-colors duration-300 cursor-pointer mt-2 disabled:opacity-50 disabled:cursor-not-allowed"
+          disabled={isLoading}
         >
-          Login
+          {isLoading ? 'Logging in...' : 'Login'}
         </button>
         <p className="text-[rgba(88,87,87,0.822)] dark:text-[var(--color-text-secondary)] text-sm text-center mt-2">
           Don't have an account ? <a href="/sign-up" className="text-[var(--color-accent)] hover:underline">Signup</a>

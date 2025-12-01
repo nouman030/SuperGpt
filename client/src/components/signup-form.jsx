@@ -11,11 +11,49 @@ const Form = () => {
   const [passwordError, setPasswordError] = useState('');
   const [confirmPasswordError, setConfirmPasswordError] = useState('');
 
-  const newUserData = {
-    username,
-    email,
-    password
+  const [apiError, setApiError] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
+
+  const registerUser = async (userData) => {
+    setApiError('');
+    setSuccessMessage('');
+    try {
+      const response = await fetch('http://localhost:3000/api/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(userData),
+      });
+
+      const contentType = response.headers.get("content-type");
+      
+      if (contentType && contentType.includes("application/json")) {
+        const data = await response.json();
+
+        if (data.Success) {
+          setSuccessMessage('Registration successful! Redirecting...');
+          console.log('User registered:', data);
+          // Optional: Redirect after a delay
+          setTimeout(() => window.location.href = '/login', 2000);
+        } else {
+          setApiError(data.message || 'Registration failed');
+        }
+      } else {
+        // Handle non-JSON errors (likely 404 or 500 HTML from Express)
+        if (response.status === 404) {
+          setApiError('API not found (404). Please restart your server to apply fixes.');
+        } else {
+          setApiError(`Server error: ${response.status} ${response.statusText}`);
+        }
+        console.error('Non-JSON response received:', await response.text());
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      setApiError('Network error. Is the server running?');
+    }
   };
+
 
   const validateForm = () => {
     let isValid = true;
@@ -67,9 +105,12 @@ const Form = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (validateForm()) {
-      // Form is valid, proceed with submission (e.g., API call)
-      console.log('Form submitted successfully:', { username, email, password });
-      // Reset form or redirect
+      const newUserData = {
+        name: username,
+        email,
+        password
+      };
+      registerUser(newUserData);
     } else {
       console.log('Form has errors');
     }
@@ -86,6 +127,18 @@ const Form = () => {
         <p className="text-[rgba(88,87,87,0.822)] dark:text-[var(--color-text-secondary)] text-sm">
           Signup now and get full access to our app.
         </p>
+        
+        {apiError && (
+          <div className="p-3 text-sm text-red-500 bg-red-100 border border-red-200 rounded-lg">
+            {apiError}
+          </div>
+        )}
+        {successMessage && (
+          <div className="p-3 text-sm text-green-500 bg-green-100 border border-green-200 rounded-lg">
+            {successMessage}
+          </div>
+        )}
+
         <label className="relative">
           <input
             required
@@ -170,7 +223,7 @@ const Form = () => {
           Submit
         </button>
         <p className="text-[rgba(88,87,87,0.822)] dark:text-[var(--color-text-secondary)] text-sm text-center">
-          Already have an account ? <a href="/login" className="text-[var(--color-accent)] hover:underline">Signin</a>
+          Already have an account ? <a href="/log-in" className="text-[var(--color-accent)] hover:underline">Signin</a>
         </p>
       </form>
     </div>

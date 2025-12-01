@@ -9,16 +9,19 @@ import { useContext } from "react";
 import { Appcontext } from "./contexts/Appcontext";
 import Login from "./pages/Login";
 import SignUp from "./pages/sign-up";
+import NotFound from "./pages/Erorr-404";
+
+
 function App() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const { theme } = useContext(Appcontext);
+  const { theme, user } = useContext(Appcontext);
 
   return (
     <>
       {!isMenuOpen && (
         <img
           src={assets.menu_icon}
-          className={`absolute top-3 left-3 w-8 h-8 
+          className={`absolute top-3 left-3 w-8 h-8 z-50
     cursor-pointer md:hidden ${theme !== "dark" ? "invert" : ""}`}
           onClick={() => setIsMenuOpen(true)}
         />
@@ -27,18 +30,28 @@ function App() {
         className={`min-h-screen bg-bg-primary text-text-primary transition-colors duration-200`}
       >
         <div className="flex w-screen h-screen">
-          <SideBar isMenuOpen={isMenuOpen} setIsMenuOpen={setIsMenuOpen} />
-          <main className="flex-1 overflow-hidden">
+          {user ? ( 
+            <>
+             <SideBar isMenuOpen={isMenuOpen} setIsMenuOpen={setIsMenuOpen} />
+              <main className="flex-1 overflow-hidden">
+                <Routes>
+               <Route path="/" element={<ChatBox />} />  
+                  <Route path="/credits" element={<Credits />} />
+                  <Route path="/community" element={<Community />} />
+                   <Route path="*" element={<NotFound />} />
+                </Routes>
+              </main>
+            </>
+          ) : (   
+            <div className="flex w-screen h-screen justify-center items-center w-full h-full">
             <Routes>
-              <Route path="/" element={<ChatBox />} />
-              <Route path="/credits" element={<Credits />} />
-              <Route path="/community" element={<Community />} />
-
+              <Route path="/" element={<Login />} />
               <Route path="/sign-up" element={<SignUp />} />
-              <Route path="/sign-in" element={<Login />} />
-              <Route path="/login" element={<Login />} />
+              <Route path="/log-in" element={<Login />} />
+              <Route path="*" element={<NotFound />} />
             </Routes>
-          </main>
+            </div>
+          )}
         </div>
       </div>
     </>

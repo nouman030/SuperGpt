@@ -1,6 +1,7 @@
 //api to register user
 import User from "../models/User.js";
 import jwt from "jsonwebtoken";
+import bcrypt from "bcryptjs";
 
 //Generate Token
 const generateToken = (id) => {
@@ -69,3 +70,14 @@ export const getUser = async (req, res) => {
     return res.status(500).json({ Success: false, message: error.message });
   }
 };
+
+//Api to logout user
+
+export const logoutUser = async (req, res) => {
+  try {
+    res.json({ Success: true, message: "User logged out successfully" });
+  } catch (error) {
+    return res.status(500).json({ Success: false, message: error.message });
+  }
+};
+
