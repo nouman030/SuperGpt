@@ -34,7 +34,7 @@ function SideBar({ isMenuOpen, setIsMenuOpen }) {
 
   return (
     <div
-      className={`fixed md:relative w-64 md:w-70 h-screen bg-bg-primary text-text-primary flex flex-col transform transition-transform duration-300 ease-in-out ${
+      className={`fixed md:relative w-64 md:w-72 h-screen bg-bg-primary text-text-primary flex flex-col transform transition-transform duration-300 ease-in-out ${
         isMenuOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
       }`}
       style={{
@@ -46,7 +46,7 @@ function SideBar({ isMenuOpen, setIsMenuOpen }) {
         <Link
           to="/"
           className="flex items-center"
-          onClick={() => setIsMenuOpen(false)}
+          onClick={() => navigate("/") && setIsMenuOpen(false)}
         >
           <img
             src={logo}

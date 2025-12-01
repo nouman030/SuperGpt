@@ -7,6 +7,8 @@ import { useState } from "react";
 import { assets } from "./assets/asset/assets";
 import { useContext } from "react";
 import { Appcontext } from "./contexts/Appcontext";
+import Login from "./pages/Login";
+import SignUp from "./pages/sign-up";
 function App() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { theme } = useContext(Appcontext);
@@ -24,13 +26,17 @@ function App() {
       <div
         className={`min-h-screen bg-bg-primary text-text-primary transition-colors duration-200`}
       >
-        <div className="flex w-screen h-screen gap-2">
+        <div className="flex w-screen h-screen">
           <SideBar isMenuOpen={isMenuOpen} setIsMenuOpen={setIsMenuOpen} />
           <main className="flex-1 overflow-hidden">
             <Routes>
               <Route path="/" element={<ChatBox />} />
               <Route path="/credits" element={<Credits />} />
               <Route path="/community" element={<Community />} />
+
+              <Route path="/sign-up" element={<SignUp />} />
+              <Route path="/sign-in" element={<Login />} />
+              <Route path="/login" element={<Login />} />
             </Routes>
           </main>
         </div>
