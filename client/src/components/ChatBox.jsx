@@ -3,8 +3,10 @@ import { Appcontext } from "../contexts/Appcontext";
 import { FiSend, FiImage, FiPaperclip } from "react-icons/fi";
 import { BsRobot, BsPerson } from "react-icons/bs";
 import logo from "../assets/logo.png";
+import { toast } from "react-hot-toast";
+
 function ChatBox() {
-  const { selectedChat } = useContext(Appcontext);
+  const { selectedChat, setSelectedChat, setChats } = useContext(Appcontext);
   const [inputValue, setInputValue] = useState("");
   const messagesEndRef = useRef(null);
   const scrollContainerRef = useRef(null);
@@ -34,33 +36,106 @@ function ChatBox() {
     e.preventDefault();
     if (inputValue.trim() === "") return;
 
-    // Add user message
-    const userMessage = {
-      isImage: false,
-      role: "user",
-      content: inputValue,
-      timestamp: Date.now(),
-    };
-
-    selectedChat.messages.push(userMessage);
-    setInputValue("");
-    // Immediate scroll for better UX
-    setTimeout(scrollToBottom, 10);
-
-    // Simulate typing indicator
-    setIsTyping(true);
-
-    // Simulate AI response (replace with actual API call)
-    setTimeout(() => {
-      const aiResponse = {
+    try {
+      const userMessage = {
         isImage: false,
-        role: "assistant",
-        content: "I'm your AI assistant. How can I help you today?",
+        role: "user",
+        content: inputValue,
         timestamp: Date.now(),
       };
-      selectedChat.messages.push(aiResponse);
+
+      // If no chat selected, create a new one
+      if (!selectedChat) {
+        setInputValue("");
+        setIsTyping(true);
+
+        const response = await fetch("http://localhost:3000/api/createChat", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: localStorage.getItem("token"),
+          },
+          body: JSON.stringify({
+            message: userMessage,
+            name: inputValue.substring(0, 30) + (inputValue.length > 30 ? "..." : ""),
+          }),
+        });
+
+        const data = await response.json();
+
+        if (data.Success) {
+          // Update chats list and select the new chat
+          setChats((prev) => [data.chat, ...prev]);
+          setSelectedChat(data.chat);
+          
+          // Simulate AI response
+          setTimeout(() => {
+            const aiResponse = {
+              isImage: false,
+              role: "assistant",
+              content: "I'm your AI assistant. How can I help you today?",
+              timestamp: Date.now(),
+            };
+            // We need to update the chat in the list with the AI response
+            // Since we just set it, we can't rely on selectedChat immediately here for the push
+            // But for simplicity in this demo, let's just update the local state
+             data.chat.messages.push(aiResponse);
+             setSelectedChat({...data.chat}); // Trigger re-render
+             setIsTyping(false);
+          }, 1500);
+
+        } else {
+          toast.error(data.message || "Failed to create chat");
+          setIsTyping(false);
+        }
+        return;
+      }
+
+      // Existing logic for adding message to selected chat
+      selectedChat.messages.push(userMessage);
+      setInputValue("");
+      setTimeout(scrollToBottom, 10);
+      setIsTyping(true);
+
+      const response = await fetch("http://localhost:3000/api/addMessage", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: localStorage.getItem("token"),
+        },
+        body: JSON.stringify({
+          chatId: selectedChat._id,
+          message: userMessage,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!data.Success) {
+        toast.error(data.message || "Failed to send message");
+        selectedChat.messages.pop();
+        setIsTyping(false);
+        return;
+      }
+
+      setTimeout(() => {
+        const aiResponse = {
+          isImage: false,
+          role: "assistant",
+          content: "I'm your AI assistant. How can I help you today?",
+          timestamp: Date.now(),
+        };
+        selectedChat.messages.push(aiResponse);
+        setIsTyping(false);
+      }, 1500);
+    } catch (error) {
+      console.error(error);
+      toast.error("Something went wrong");
       setIsTyping(false);
-    }, 1500);
+      if (selectedChat) {
+         selectedChat.messages.pop();
+      }
+    }
   };
 
   const formatTime = (timestamp) => {

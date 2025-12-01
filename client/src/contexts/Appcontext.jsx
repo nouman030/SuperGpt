@@ -1,5 +1,5 @@
 import React, { createContext, useState, useEffect } from "react";
-import { dummyChats, dummyUserData } from "../assets/asset/assets";
+
 
 const Appcontext = createContext();
 
@@ -51,11 +51,28 @@ const AppcontextProvider = ({ children }) => {
   useEffect(() => {
     // Simulate API call to fetch chats
     const fetchChats = async () => {
-      setChats(dummyChats);
+      if (user) {
+        const response = await fetch('http://localhost:3000/api/getUserChats', {
+          headers: {
+            Authorization: localStorage.getItem('token'),
+          },
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          if (data.Success) {
+            setChats(data.chats);
+          } else {
+            setChats([]);
+          }
+        } else {
+          setChats([]);
+        }
+      }
     };
 
     fetchChats();
-  }, []);
+  }, [user]);
   useEffect(() => {
     // Initialize theme from localStorage or system preference
     const savedTheme = localStorage.getItem("theme");

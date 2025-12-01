@@ -10,6 +10,7 @@ import { Appcontext } from "./contexts/Appcontext";
 import Login from "./pages/Login";
 import SignUp from "./pages/sign-up";
 import NotFound from "./pages/Erorr-404";
+import { Toaster } from "react-hot-toast";
 
 
 function App() {
@@ -18,6 +19,7 @@ function App() {
 
   return (
     <>
+      <Toaster position="top-right" reverseOrder={false} />
       {!isMenuOpen && (
         <img
           src={assets.menu_icon}
@@ -43,7 +45,7 @@ function App() {
               </main>
             </>
           ) : (   
-            <div className="flex w-screen h-screen justify-center items-center w-full h-full">
+            <div className="flex w-screen h-screen justify-center items-center">
             <Routes>
               <Route path="/" element={<Login />} />
               <Route path="/sign-up" element={<SignUp />} />

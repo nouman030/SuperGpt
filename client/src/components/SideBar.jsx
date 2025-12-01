@@ -15,11 +15,12 @@ import { Link, useNavigate } from "react-router-dom";
 import logo from "../assets/Logo_with_name.png";
 import moment from "moment";
 import { assets } from "../assets/asset/assets";
+import { toast } from "react-hot-toast";
 
 import { usePopup, ConfirmationPopup } from "../hooks/popup";
 
 function SideBar({ isMenuOpen, setIsMenuOpen }) {
-  const { chats, selectedChat, setSelectedChat, user, theme, setTheme, setUser } =
+  const { chats, setChats, selectedChat, setSelectedChat, user, theme, setTheme, setUser } =
     useContext(Appcontext);
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
@@ -44,6 +45,59 @@ function SideBar({ isMenuOpen, setIsMenuOpen }) {
     setUser(null);
     navigate("/log-in");
     closePopup();
+  };
+
+  const newChat = async () => {
+    try {
+      const response = await fetch("http://localhost:3000/api/createChat", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: localStorage.getItem("token"),
+        },
+        body: JSON.stringify({
+          name: "New Chat",
+        }),
+      });
+      const data = await response.json();
+      if (data.Success) {
+        toast.success("New chat created!");
+        navigate("/");
+        setIsMenuOpen(false);
+        setChats((prev) => [data.chat, ...prev]);
+        setSelectedChat(data.chat);
+      } else {
+        toast.error(data.message || "Failed to create chat");
+      }
+    } catch (error) {
+      console.log(error);
+      toast.error("Something went wrong");
+    }
+  };
+
+  const onDeleteChat = async (chatId) => {
+    try {
+      const response = await fetch(`http://localhost:3000/api/deleteChat/${chatId}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: localStorage.getItem("token"),
+        },
+      });
+      const data = await response.json();
+      if (data.Success) {
+        toast.success("Chat deleted");
+        setChats((prev) => prev.filter((chat) => chat._id !== chatId));
+        if (selectedChat?._id === chatId) {
+          setSelectedChat(null);
+          navigate("/");
+        }
+      } else {
+        toast.error(data.message || "Failed to delete chat");
+      }
+    } catch (error) {
+      console.log(error);
+      toast.error("Something went wrong");
+    }
   };
 
   return (
@@ -82,11 +136,14 @@ function SideBar({ isMenuOpen, setIsMenuOpen }) {
         {/* New Chat Button */}
         <button
           className="flex items-center justify-center cursor-pointer gap-2 mx-4 mb-1 p-3 rounded-lg border bg-bg-secondary/20 text-text-primary border-border hover:bg-bg-tertiary transition-colors"
-          onClick={() => setSelectedChat(null)}
+          onClick={() => newChat()}
         >
           <FiPlus className="w-5 h-5" />
           <span>New chat</span>
         </button>
+
+
+
         {/* Search Bar */}
         <div className="p-4">
           <div className="relative">
