@@ -138,7 +138,7 @@ function Credits() {
                 <div>
                   <p className="text-sm text-text-secondary font-semibold uppercase tracking-wider mb-1">Current Balance</p>
                   <div className="flex items-baseline gap-1">
-                    <span className="text-4xl font-extrabold text-text-primary">₹{currentCredit}</span>
+                    <span className="text-4xl font-extrabold text-text-primary">{currentCredit}</span>
                     <span className="text-sm text-text-secondary font-medium">credits</span>
                   </div>
                 </div>

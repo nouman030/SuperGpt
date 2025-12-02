@@ -1,15 +1,34 @@
 
-import { GoogleGenAI } from "@google/genai";
 import Bytez from "bytez.js";
 
-const ai = new GoogleGenAI(process.env.GEMINI_API_KEY);
+const LLM_MODEL_NAME = "openai/gpt-4.1-mini";
 
 async function LLM(prompt) {
-  const response = await ai.models.generateContent({
-    model: "gemini-2.5-flash",
-    contents: prompt,
-  });
-  return response.text;
+  try {
+    const model = bytezSdk.model(LLM_MODEL_NAME);
+     const messages = [{
+      "role": "user",
+      "content": prompt
+    }];
+
+    const { error, output } = await model.run(messages);
+
+    if (error) {
+      throw new Error(`Bytez LLM generation error: ${error.message || JSON.stringify(error)}`);
+    }
+
+    if (!output) {
+      throw new Error("No output received from Bytez LLM generation.");
+    }
+
+    if (typeof output === 'object' && output.content) {
+      return output.content;
+    }
+    return output;
+  } catch (error) {
+    console.error("Error generating text with Bytez:", error);
+    throw error;
+  }
 }
 
 

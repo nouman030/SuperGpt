@@ -177,3 +177,15 @@ export const deleteChat = async (req, res) => {
     res.status(500).json({ Success: false, message: error.message });
   }
 };
+
+
+// Get community images
+export const getCommunityImages = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const images = await Generated_Img.find({ userId }).sort({ timestamp: -1 });
+    res.status(200).json({ Success: true, images });
+  } catch (error) {
+    res.status(500).json({ Success: false, message: error.message });
+  }
+};

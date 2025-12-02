@@ -1,6 +1,7 @@
 import React, { useContext, useState, useRef, useEffect } from "react";
 import { Appcontext } from "../contexts/Appcontext";
 import { FiSend, FiImage, FiPaperclip } from "react-icons/fi";
+import { FaDownload, FaExpand, FaTimes } from "react-icons/fa";
 import { BsRobot, BsPerson } from "react-icons/bs";
 import logo from "../assets/logo.png";
 import { toast } from "react-hot-toast";
@@ -17,6 +18,25 @@ function ChatBox() {
 
   const [inputMode, setInputMode] = useState("text"); // 'text' or 'image'
   const [showModeDropdown, setShowModeDropdown] = useState(false);
+  const [selectedImage, setSelectedImage] = useState(null);
+
+  const handleDownload = async (imageUrl, prompt) => {
+    try {
+      const response = await fetch(imageUrl);
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `generated-image-${prompt ? prompt.substring(0, 20) : 'ai'}-${Date.now()}.jpg`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error("Download failed:", err);
+      window.open(imageUrl, "_blank");
+    }
+  };
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -229,12 +249,38 @@ function ChatBox() {
                       }}
                     >
                       {message.isImage ? (
-                        <img
-                          src={message.content}
-                          alt="Chat content"
-                          className="max-w-full rounded-lg shadow-sm mb-2"
-                          onLoad={scrollToBottom}
-                        />
+                        <div className="relative group overflow-hidden rounded-lg shadow-sm mb-2">
+                          <img
+                            src={message.content}
+                            alt="Chat content"
+                            className="max-w-full object-cover cursor-pointer transition-transform duration-300 group-hover:scale-105"
+                            onLoad={scrollToBottom}
+                            onClick={() => setSelectedImage({ imageUrl: message.content, prompt: "generated-image" })}
+                          />
+                          {/* Overlay */}
+                          <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center gap-4">
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setSelectedImage({ imageUrl: message.content, prompt: "generated-image" });
+                              }}
+                              className="p-2 bg-white/20 backdrop-blur-sm rounded-full text-white hover:bg-white/40 transition-colors"
+                              title="Preview"
+                            >
+                              <FaExpand />
+                            </button>
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleDownload(message.content, "generated-image");
+                              }}
+                              className="p-2 bg-white/20 backdrop-blur-sm rounded-full text-white hover:bg-white/40 transition-colors"
+                              title="Download"
+                            >
+                              <FaDownload />
+                            </button>
+                          </div>
+                        </div>
                       ) : (
                         <div className="markdown-container text-[15px] md:text-base leading-relaxed">
                           <ReactMarkdown
@@ -415,6 +461,39 @@ function ChatBox() {
           </div>
         </div>
       </div>
+      {/* Image Preview Modal */}
+      {selectedImage && (
+        <div 
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-4 backdrop-blur-sm animate-fadeIn"
+          onClick={() => setSelectedImage(null)}
+        >
+          <button
+            className="absolute top-4 right-4 text-white/70 hover:text-white text-3xl transition-colors cursor-pointer z-50"
+            onClick={() => setSelectedImage(null)}
+          >
+            <FaTimes />
+          </button>
+          
+          <div 
+            className="relative max-w-5xl max-h-[90vh] w-full flex flex-col items-center"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <img
+              src={selectedImage.imageUrl}
+              alt="Preview"
+              className="max-w-full max-h-[80vh] object-contain rounded-lg shadow-2xl"
+            />
+            <div className="mt-4 flex items-center gap-4">
+              <button
+                onClick={() => handleDownload(selectedImage.imageUrl, selectedImage.prompt)}
+                className="flex items-center gap-2 px-4 py-2 bg-(--color-accent) text-white rounded-lg hover:bg-(--color-accent-hover) transition-colors cursor-pointer"
+              >
+                <FaDownload /> Download
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
