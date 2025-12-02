@@ -56,7 +56,7 @@ function ChatBox() {
             Authorization: localStorage.getItem("token"),
           },
           body: JSON.stringify({
-            message: userMessage,
+            message: inputValue,
             name: inputValue.substring(0, 30) + (inputValue.length > 30 ? "..." : ""),
           }),
         });
@@ -69,16 +69,13 @@ function ChatBox() {
           setSelectedChat(data.chat);
           
           // Simulate AI response
-          setTimeout(() => {
-            const aiResponse = {
+          setTimeout(async () => {
+            const aiResponse = await {
               isImage: false,
               role: "assistant",
-              content: "I'm your AI assistant. How can I help you today?",
+              content: data.chat.messages[data.chat.messages.length - 1].content,
               timestamp: Date.now(),
             };
-            // We need to update the chat in the list with the AI response
-            // Since we just set it, we can't rely on selectedChat immediately here for the push
-            // But for simplicity in this demo, let's just update the local state
              data.chat.messages.push(aiResponse);
              setSelectedChat({...data.chat}); // Trigger re-render
              setIsTyping(false);
@@ -105,7 +102,7 @@ function ChatBox() {
         },
         body: JSON.stringify({
           chatId: selectedChat._id,
-          message: userMessage,
+          message: inputValue,
         }),
       });
 
@@ -122,7 +119,7 @@ function ChatBox() {
         const aiResponse = {
           isImage: false,
           role: "assistant",
-          content: "I'm your AI assistant. How can I help you today?",
+          content: data.chat.messages[data.chat.messages.length - 1].content,
           timestamp: Date.now(),
         };
         selectedChat.messages.push(aiResponse);

@@ -5,6 +5,7 @@ import connectDB from "./configs/db.js";
 import userRoutes from "./routes/userRoutes.js";
 const app = express();
 await connectDB();
+
 // middlewares
 app.use(cors());
 app.use(express.json());

@@ -1,3 +1,4 @@
+import LLM from "../configs/Llm.js";
 import Chat from "../models/Chats.js";
 import User from "../models/User.js";
 
@@ -20,7 +21,10 @@ export const createChat = async (req, res) => {
     };
 
     if (message) {
-      chatData.messages.push(message);
+      chatData.messages.push({
+        role: "user",
+        content: message,
+      });
     }
 
     const newChat = await Chat.create(chatData);
@@ -41,7 +45,18 @@ export const addMessage = async (req, res) => {
       return res.status(404).json({ Success: false, message: "Chat not found" });
     }
 
-    chat.messages.push(message);
+    chat.messages.push({
+      role: "user",
+      content: message,
+    });
+
+    const LLM_response = await LLM(message);
+
+    chat.messages.push({
+      role: "assistant",
+      content: LLM_response,
+    });
+
     await chat.save();
 
     res.status(200).json({ Success: true, chat });

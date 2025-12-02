@@ -14,4 +14,5 @@ userRoutes.post('/addMessage', Protect, addMessage);
 userRoutes.get('/getUserChats', Protect, getUserChats);
 userRoutes.get('/getChatById/:id', Protect, getChatById);
 userRoutes.delete('/deleteChat/:id', Protect, deleteChat);
+
 export default userRoutes;
