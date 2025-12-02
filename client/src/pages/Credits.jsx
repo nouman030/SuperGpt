@@ -102,14 +102,21 @@ function Credits() {
 
   return (
     <div className="h-full bg-[var(--color-bg-primary)] text-text-primary font-sans overflow-y-auto w-full transition-colors duration-300">
+     
+      
       {/* Background Decor */}
       <div className="fixed top-0 left-0 w-full h-full overflow-hidden pointer-events-none z-0">
         <div className="absolute top-[-10%] right-[-5%] w-[500px] h-[500px] bg-accent/5 rounded-full blur-[100px] mix-blend-multiply dark:mix-blend-screen opacity-70 animate-blob"></div>
         <div className="absolute bottom-[-10%] left-[-5%] w-[500px] h-[500px] bg-purple-500/5 rounded-full blur-[100px] mix-blend-multiply dark:mix-blend-screen opacity-70 animate-blob animation-delay-2000"></div>
       </div>
 
-      <div className="relative z-10 max-w-7xl mx-auto px-6 py-16 md:py-24">
-        
+      <div className="bg-yellow-500/20 text-yellow-500 border border-yellow-500 rounded-lg mt-20 p-4 text-center text-lg font-semibold mx-auto max-w-2xl">
+        <p>The credit system is temporarily unavailable in this demo version.</p>
+        <p className="text-sm mt-2 opacity-80">Please check back later for full functionality.</p>
+      </div>
+      
+      <div className="relative z-10 max-w-7xl mx-auto px-6 py-16 md:py-16">
+      
         {/* Header Section */}
         <div className="flex flex-col lg:flex-row justify-between items-end mb-20 gap-10">
           <div className="max-w-2xl">

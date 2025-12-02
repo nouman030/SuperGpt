@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { FaDownload, FaExpand, FaTimes } from "react-icons/fa";
-
+import Loader from "../components/Loading";
 const Community = () => {
   const [userCommunityImages, setUserCommunityImages] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -59,7 +59,7 @@ const Community = () => {
   if (loading) {
     return (
       <div className="flex justify-center items-center h-screen bg-(--color-bg-primary)">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-(--color-accent)"></div>
+        <Loader />
       </div>
     );
   }
@@ -74,10 +74,9 @@ const Community = () => {
 
   return (
     <div className="min-h-screen bg-(--color-bg-primary) p-6">
-      <h1 className="text-center text-3xl font-bold mb-8 text-(--color-text-primary) animate-slideUp">
+      <h1 className="text-center text-3xl font-bold mt-5 mb-8 bg-gradient-to-r from-blue-400 to-purple-600 text-transparent bg-clip-text animate-slideUp">
         Community Showcase
       </h1>
-      
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 animate-fadeIn">
         {userCommunityImages.map((image, index) => (
           <div

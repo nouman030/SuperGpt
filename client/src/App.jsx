@@ -11,12 +11,12 @@ import Login from "./pages/Login";
 import SignUp from "./pages/sign-up";
 import NotFound from "./pages/Erorr-404";
 import { Toaster } from "react-hot-toast";
+import Loader from "./components/Loading";
 
-
-function App() {
+function App() {  
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { theme, user } = useContext(Appcontext);
-
+  const [loading, setLoading] = useState(false);
   return (
     <>
       <Toaster position="top-right" reverseOrder={false} />
@@ -27,21 +27,27 @@ function App() {
     cursor-pointer md:hidden ${theme !== "dark" ? "invert" : ""}`}
           onClick={() => setIsMenuOpen(true)}
         />
-      )}
+      )}  
       <div
         className={`min-h-screen bg-bg-primary text-text-primary transition-colors duration-200`}
       >
         <div className="flex w-screen h-screen">
-          {user ? ( 
+          {user && !loading ? ( 
             <>
              <SideBar isMenuOpen={isMenuOpen} setIsMenuOpen={setIsMenuOpen} />
               <main className="flex-1 overflow-hidden">
-                <Routes>
-               <Route path="/" element={<ChatBox />} />  
-                  <Route path="/credits" element={<Credits />} />
-                  <Route path="/community" element={<Community />} />
-                   <Route path="*" element={<NotFound />} />
-                </Routes>
+                {loading ? (
+                  <div className="flex w-full h-full justify-center items-center">
+                    <Loader />
+                  </div>
+                ) : (
+                  <Routes>
+                    <Route path="/" element={<ChatBox />} /> 
+                    <Route path="/credits" element={<Credits />} />
+                    <Route path="/community" element={<Community />} />
+                    <Route path="*" element={<NotFound />} />
+                  </Routes>
+                )}
               </main>
             </>
           ) : (   

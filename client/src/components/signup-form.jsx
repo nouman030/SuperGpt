@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import toast from 'react-hot-toast';
 
 const Form = () => {
   const [username, setUsername] = useState('');
@@ -33,7 +34,7 @@ const Form = () => {
 
         if (data.Success) {
           setSuccessMessage('Registration successful! Redirecting...');
-          console.log('User registered:', data);
+          
           // Optional: Redirect after a delay
           setTimeout(() => window.location.href = '/login', 2000);
         } else {
@@ -112,7 +113,7 @@ const Form = () => {
       };
       registerUser(newUserData);
     } else {
-      console.log('Form has errors');
+      toast.error('Form has errors');
     }
   };
 

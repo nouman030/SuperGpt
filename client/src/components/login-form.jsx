@@ -78,7 +78,6 @@ const LoginForm = () => {
     setPasswordError(passwordValidation);
 
     if (emailValidation || passwordValidation) {
-      console.log('Form has client-side errors.');
       return;
     }
 
@@ -95,7 +94,7 @@ const LoginForm = () => {
       const data = await response.json();
 
       if (response.ok && data.Success) {
-        console.log('User logged in:', data);
+        
         localStorage.setItem('token', data.token);
         // Optional: Redirect after a delay
         setTimeout(() => window.location.href = '/', 2000);

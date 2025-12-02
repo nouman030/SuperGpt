@@ -8,7 +8,6 @@ import { toast } from "react-hot-toast";
 import ReactMarkdown from "react-markdown";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { vscDarkPlus } from "react-syntax-highlighter/dist/esm/styles/prism";
-
 function ChatBox() {
   const { selectedChat, setSelectedChat, setChats } = useContext(Appcontext);
   const [inputValue, setInputValue] = useState("");
@@ -19,7 +18,7 @@ function ChatBox() {
   const [inputMode, setInputMode] = useState("text"); // 'text' or 'image'
   const [showModeDropdown, setShowModeDropdown] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
-
+  const [loading, setLoading] = useState(false);
   const handleDownload = async (imageUrl, prompt) => {
     try {
       const response = await fetch(imageUrl);
@@ -103,10 +102,7 @@ function ChatBox() {
               content: data.chat.messages[data.chat.messages.length - 1].content,
               timestamp: Date.now(),
             };
-             // Ensure we don't duplicate if the backend already added it (which it does)
-             // But for optimistic UI or sync, we might need to check. 
-             // In this flow, we are fetching the chat which already has the message.
-             // So we just update the selectedChat with the new chat data.
+
              setSelectedChat({...data.chat}); 
              setIsTyping(false);
           }, 1500);

@@ -70,7 +70,7 @@ function SideBar({ isMenuOpen, setIsMenuOpen }) {
         toast.error(data.message || "Failed to create chat");
       }
     } catch (error) {
-      console.log(error);
+      
       toast.error("Something went wrong");
     }
   };
@@ -95,7 +95,6 @@ function SideBar({ isMenuOpen, setIsMenuOpen }) {
         toast.error(data.message || "Failed to delete chat");
       }
     } catch (error) {
-      console.log(error);
       toast.error("Something went wrong");
     }
   };

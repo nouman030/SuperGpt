@@ -39,7 +39,7 @@ const imageModel = bytezSdk.model("google/imagen-4.0-ultra-generate-001");
 
 export async function generateImage(prompt) {
   try {
-    console.log("Generating image with Bytez (Imagen 4.0 Ultra) for prompt:", prompt);
+   
 
     const { error, output } = await imageModel.run(prompt);
 
