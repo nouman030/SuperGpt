@@ -74,7 +74,7 @@ function ChatBox() {
         setInputValue("");
         setIsTyping(true);
 
-        const response = await fetch("http://localhost:3000/api/createChat", {
+        const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/createChat`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -120,7 +120,7 @@ function ChatBox() {
       setTimeout(scrollToBottom, 10);
       setIsTyping(true);
 
-      const response = await fetch("http://localhost:3000/api/addMessage", {
+      const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/addMessage`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

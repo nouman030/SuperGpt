@@ -19,7 +19,7 @@ const AppcontextProvider = ({ children }) => {
       }
 
       try {
-        const response = await fetch('http://localhost:3000/api/user', {
+        const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/user`, {
           headers: {
             Authorization: token,
           },
@@ -52,7 +52,7 @@ const AppcontextProvider = ({ children }) => {
     // Simulate API call to fetch chats
     const fetchChats = async () => {
       if (user) {
-        const response = await fetch('http://localhost:3000/api/getUserChats', {
+        const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/getUserChats`, {
           headers: {
             Authorization: localStorage.getItem('token'),
           },

@@ -11,7 +11,7 @@ const Community = () => {
     try {
       setLoading(true);
       const token = localStorage.getItem("token");
-      const response = await fetch("http://localhost:3000/api/getCommunityImages", {
+      const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/getCommunityImages`, {
         headers: {
           Authorization: token,
         },

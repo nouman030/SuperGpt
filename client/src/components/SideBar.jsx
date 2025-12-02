@@ -49,7 +49,7 @@ function SideBar({ isMenuOpen, setIsMenuOpen }) {
 
   const newChat = async () => {
     try {
-      const response = await fetch("http://localhost:3000/api/createChat", {
+      const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/createChat`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -77,7 +77,7 @@ function SideBar({ isMenuOpen, setIsMenuOpen }) {
 
   const onDeleteChat = async (chatId) => {
     try {
-      const response = await fetch(`http://localhost:3000/api/deleteChat/${chatId}`, {
+      const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/deleteChat/${chatId}`, {
         method: "DELETE",
         headers: {
           Authorization: localStorage.getItem("token"),

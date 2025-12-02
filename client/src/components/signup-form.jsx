@@ -19,7 +19,7 @@ const Form = () => {
     setApiError('');
     setSuccessMessage('');
     try {
-      const response = await fetch('http://localhost:3000/api/register', {
+      const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
