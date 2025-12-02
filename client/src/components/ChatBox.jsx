@@ -4,6 +4,9 @@ import { FiSend, FiImage, FiPaperclip } from "react-icons/fi";
 import { BsRobot, BsPerson } from "react-icons/bs";
 import logo from "../assets/logo.png";
 import { toast } from "react-hot-toast";
+import ReactMarkdown from "react-markdown";
+import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
+import { vscDarkPlus } from "react-syntax-highlighter/dist/esm/styles/prism";
 
 function ChatBox() {
   const { selectedChat, setSelectedChat, setChats } = useContext(Appcontext);
@@ -224,10 +227,64 @@ function ChatBox() {
                           onLoad={scrollToBottom}
                         />
                       ) : (
-                        <p className="whitespace-pre-wrap leading-relaxed text-[15px] md:text-base">
-                          {message.content}
-                        </p>
+
+                        <div className="markdown-container text-[15px] md:text-base leading-relaxed">
+                          <ReactMarkdown
+                            components={{
+                              code({ node, inline, className, children, ...props }) {
+                                const match = /language-(\w+)/.exec(className || "");
+                                return !inline && match ? (
+                                  <div className="rounded-md overflow-hidden my-2 border border-(--color-border)">
+                                    <div className="flex items-center justify-between px-4 py-1.5 bg-[#1e1e1e] border-b border-(--color-border)">
+                                      <span className="text-xs font-medium text-gray-400 lowercase">
+                                        {match[1]}
+                                      </span>
+                                      <button
+                                        onClick={() => {
+                                           navigator.clipboard.writeText(String(children).replace(/\n$/, ""));
+                                           toast.success("Copied to clipboard!");
+                                        }}
+                                        className="text-xs text-gray-400 hover:text-white transition-colors cursor-pointer"
+                                      >
+                                        Copy
+                                      </button>
+                                    </div>
+                                    <SyntaxHighlighter
+                                      style={vscDarkPlus}
+                                      language={match[1]}
+                                      PreTag="div"
+                                      customStyle={{
+                                        margin: 0,
+                                        borderRadius: "0 0 0.375rem 0.375rem",
+                                        fontSize: "0.875rem", // 14px
+                                      }}
+                                      {...props}
+                                    >
+                                      {String(children).replace(/\n$/, "")}
+                                    </SyntaxHighlighter>
+                                  </div>
+                                ) : (
+                                  <code className={`${className} bg-black/20 rounded px-1 py-0.5 text-sm`} {...props}>
+                                    {children}
+                                  </code>
+                                );
+                              },
+                              p: ({ children }) => <p className="mb-2 last:mb-0">{children}</p>,
+                              ul: ({ children }) => <ul className="list-disc ml-4 mb-2">{children}</ul>,
+                              ol: ({ children }) => <ol className="list-decimal ml-4 mb-2">{children}</ol>,
+                              li: ({ children }) => <li className="mb-1">{children}</li>,
+                              a: ({ href, children }) => (
+                                <a href={href} target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:underline">
+                                  {children}
+                                </a>
+                              ),
+                            }}
+                          >
+                            {message.content}
+                          </ReactMarkdown>
+                        </div>
                       )}
+
                     </div>
                     <span 
                       className={`text-[11px] mt-1.5 font-medium opacity-70 ${
