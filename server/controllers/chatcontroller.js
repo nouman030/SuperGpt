@@ -1,6 +1,7 @@
-import LLM from "../configs/Llm.js";
+import LLM, { generateImage } from "../configs/Llm.js";
 import Chat from "../models/Chats.js";
 import User from "../models/User.js";
+import Generated_Img from "../models/Generated_Img.js";
 
 // Create a new chat
 export const createChat = async (req, res) => {
@@ -25,6 +26,40 @@ export const createChat = async (req, res) => {
         role: "user",
         content: message,
       });
+      
+      // Generate initial response
+      const { mode } = req.body;
+      const imageKeywords = ["generate image", "create image", "draw", "imagine"];
+      const isImageRequest = mode === 'image' || imageKeywords.some((keyword) =>
+        message.toLowerCase().includes(keyword)
+      );
+
+      if (isImageRequest) {
+        try {
+          const imageUrl = await generateImage(message);
+          await Generated_Img.create({
+            userId,
+            prompt: message,
+            imageUrl,
+          });
+          chatData.messages.push({
+            role: "assistant",
+            content: imageUrl,
+            isImage: true,
+          });
+        } catch (error) {
+           chatData.messages.push({
+            role: "assistant",
+            content: "Sorry, I encountered an error while generating the image.",
+          });
+        }
+      } else {
+         const LLM_response = await LLM(message);
+         chatData.messages.push({
+          role: "assistant",
+          content: LLM_response,
+        });
+      }
     }
 
     const newChat = await Chat.create(chatData);
@@ -39,6 +74,7 @@ export const createChat = async (req, res) => {
 export const addMessage = async (req, res) => {
   try {
     const { chatId, message } = req.body;
+    const userId = req.user._id;
 
     const chat = await Chat.findById(chatId);
     if (!chat) {
@@ -50,12 +86,44 @@ export const addMessage = async (req, res) => {
       content: message,
     });
 
-    const LLM_response = await LLM(message);
+    // Check if the message is asking for an image
+    // Prioritize explicit mode if provided
+    const { mode } = req.body;
+    const imageKeywords = ["generate image", "create image", "draw", "imagine"];
+    const isImageRequest = mode === 'image' || imageKeywords.some((keyword) =>
+      message.toLowerCase().includes(keyword)
+    );
 
-    chat.messages.push({
-      role: "assistant",
-      content: LLM_response,
-    });
+    if (isImageRequest) {
+      try {
+        const imageUrl = await generateImage(message);
+
+        // Save generated image to database
+        await Generated_Img.create({
+          userId,
+          prompt: message,
+          imageUrl,
+        });
+
+        chat.messages.push({
+          role: "assistant",
+          content: imageUrl,
+          isImage: true,
+        });
+      } catch (error) {
+        chat.messages.push({
+          role: "assistant",
+          content: "Sorry, I encountered an error while generating the image.",
+        });
+      }
+    } else {
+      const LLM_response = await LLM(message);
+
+      chat.messages.push({
+        role: "assistant",
+        content: LLM_response,
+      });
+    }
 
     await chat.save();
 

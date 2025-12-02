@@ -15,6 +15,9 @@ function ChatBox() {
   const scrollContainerRef = useRef(null);
   const [isTyping, setIsTyping] = useState(false);
 
+  const [inputMode, setInputMode] = useState("text"); // 'text' or 'image'
+  const [showModeDropdown, setShowModeDropdown] = useState(false);
+
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
@@ -61,6 +64,7 @@ function ChatBox() {
           body: JSON.stringify({
             message: inputValue,
             name: inputValue.substring(0, 30) + (inputValue.length > 30 ? "..." : ""),
+            mode: inputMode,
           }),
         });
 
@@ -74,13 +78,16 @@ function ChatBox() {
           // Simulate AI response
           setTimeout(async () => {
             const aiResponse = await {
-              isImage: false,
+              isImage: data.chat.messages[data.chat.messages.length - 1].isImage || false,
               role: "assistant",
               content: data.chat.messages[data.chat.messages.length - 1].content,
               timestamp: Date.now(),
             };
-             data.chat.messages.push(aiResponse);
-             setSelectedChat({...data.chat}); // Trigger re-render
+             // Ensure we don't duplicate if the backend already added it (which it does)
+             // But for optimistic UI or sync, we might need to check. 
+             // In this flow, we are fetching the chat which already has the message.
+             // So we just update the selectedChat with the new chat data.
+             setSelectedChat({...data.chat}); 
              setIsTyping(false);
           }, 1500);
 
@@ -106,6 +113,7 @@ function ChatBox() {
         body: JSON.stringify({
           chatId: selectedChat._id,
           message: inputValue,
+          mode: inputMode,
         }),
       });
 
@@ -119,10 +127,11 @@ function ChatBox() {
       }
 
       setTimeout(() => {
+        const lastMsg = data.chat.messages[data.chat.messages.length - 1];
         const aiResponse = {
-          isImage: false,
+          isImage: lastMsg.isImage || false,
           role: "assistant",
-          content: data.chat.messages[data.chat.messages.length - 1].content,
+          content: lastMsg.content,
           timestamp: Date.now(),
         };
         selectedChat.messages.push(aiResponse);
@@ -227,7 +236,6 @@ function ChatBox() {
                           onLoad={scrollToBottom}
                         />
                       ) : (
-
                         <div className="markdown-container text-[15px] md:text-base leading-relaxed">
                           <ReactMarkdown
                             components={{
@@ -284,7 +292,6 @@ function ChatBox() {
                           </ReactMarkdown>
                         </div>
                       )}
-
                     </div>
                     <span 
                       className={`text-[11px] mt-1.5 font-medium opacity-70 ${
@@ -337,18 +344,41 @@ function ChatBox() {
               borderColor: 'var(--color-border)'
             }}
           >
-            {/* Text Dropdown (Visual) */}
-            <div className="hidden md:flex items-center gap-1 pr-4 border-r border-[var(--color-border)] text-(--color-text-secondary) cursor-pointer hover:text-(--color-text-primary) transition-colors">
-              <span className="text-sm font-medium">Text</span>
-              <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
+            {/* Mode Dropdown */}
+            <div className="relative">
+              <div 
+                className="hidden md:flex items-center gap-1 pr-4 border-r border-(--color-border) text-(--color-text-secondary) cursor-pointer hover:text-(--color-text-primary) transition-colors"
+                onClick={() => setShowModeDropdown(!showModeDropdown)}
+              >
+                <span className="text-sm font-medium capitalize min-w-[40px]">{inputMode}</span>
+                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
+                
+                {/* Dropdown Menu */}
+                {showModeDropdown && (
+                  <div className="absolute bottom-full left-0 mb-2 w-32 bg-(--color-bg-secondary) border border-(--color-border) rounded-xl shadow-xl overflow-hidden z-50 animate-fadeIn">
+                    <div 
+                      className={`px-4 py-2 text-sm hover:bg-(--color-bg-tertiary) cursor-pointer flex items-center gap-2 ${inputMode === 'text' ? 'text-(--color-accent)' : ''}`}
+                      onClick={() => { setInputMode('text'); setShowModeDropdown(false); }}
+                    >
+                      <BsPerson className="w-4 h-4" /> Text
+                    </div>
+                    <div 
+                      className={`px-4 py-2 text-sm hover:bg-(--color-bg-tertiary) cursor-pointer flex items-center gap-2 ${inputMode === 'image' ? 'text-(--color-accent)' : ''}`}
+                      onClick={() => { setInputMode('image'); setShowModeDropdown(false); }}
+                    >
+                      <FiImage className="w-4 h-4" /> Image
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
 
             <input
               type="text"
               value={inputValue}
               onChange={handleInputChange}
-              placeholder="Type your prompt here..."
-              className="flex-1 bg-transparent text-(--color-text-primary) placeholder-gray-400 focus:outline-none text-base py-2"
+              placeholder={inputMode === 'image' ? "Describe the image you want to generate..." : "Type your prompt here..."}
+              className="flex-1 bg-transparent text-(--color-text-primary) placeholder-gray-400 focus:outline-none text-base py-2 pl-2"
             />
             
             <div className="flex items-center gap-1">
@@ -360,14 +390,6 @@ function ChatBox() {
                 <FiPaperclip className="h-5 w-5" />
               </button>
               
-              <button
-                type="button"
-                className="p-2 rounded-full hover:bg-(--color-bg-tertiary) text-(--color-text-secondary) transition-colors"
-                title="Send image"
-              >
-                <FiImage className="h-5 w-5" />
-              </button>
-
               <button
                 type="submit"
                 disabled={!inputValue.trim()}
