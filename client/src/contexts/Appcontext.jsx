@@ -12,6 +12,7 @@ const AppcontextProvider = ({ children }) => {
   useEffect(() => {
     // Simulate API call to fetch user data
     const fetchUser = async () => {
+      console.log("Backend URL:", import.meta.env.VITE_BACKEND_URL);
       const token = localStorage.getItem('token');
       if (!token) {
         setLoading(false);

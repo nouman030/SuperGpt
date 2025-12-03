@@ -15,5 +15,8 @@ userRoutes.get('/getUserChats', Protect, getUserChats);
 userRoutes.get('/getChatById/:id', Protect, getChatById);
 userRoutes.delete('/deleteChat/:id', Protect, deleteChat);
 userRoutes.get('/getCommunityImages', Protect, getCommunityImages);
+userRoutes.get('/hello', (req, res) => {
+    res.send("Hello World!");
+});
 
 export default userRoutes;

@@ -5,7 +5,10 @@ const LLM_MODEL_NAME = "openai/gpt-4.1-mini";
 
 async function LLM(prompt) {
   try {
+    const bytezKey = process.env.BYTEZ_API_KEY;
+    const bytezSdk = new Bytez(bytezKey);
     const model = bytezSdk.model(LLM_MODEL_NAME);
+    
      const messages = [{
       "role": "user",
       "content": prompt
@@ -33,13 +36,11 @@ async function LLM(prompt) {
 
 
 
-const bytezKey = process.env.BYTEZ_API_KEY; 
-const bytezSdk = new Bytez(bytezKey);
-const imageModel = bytezSdk.model("google/imagen-4.0-ultra-generate-001");
-
 export async function generateImage(prompt) {
   try {
-   
+    const bytezKey = process.env.BYTEZ_API_KEY;
+    const bytezSdk = new Bytez(bytezKey);
+    const imageModel = bytezSdk.model("google/imagen-4.0-ultra-generate-001");
 
     const { error, output } = await imageModel.run(prompt);
 

@@ -4,7 +4,6 @@ import cors from "cors";
 import connectDB from "./configs/db.js";
 import userRoutes from "./routes/userRoutes.js";
 const app = express();
-await connectDB();
 
 // middlewares
 app.use(cors());
@@ -18,7 +17,14 @@ app.get("/", (req, res) => {
 app.use("/api", userRoutes);
 
 // server
-const PORT = process.env.PORT;
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+const PORT = process.env.PORT || 3000;
+
+connectDB().then(() => {
+    if (process.env.NODE_ENV !== 'production') {
+        app.listen(PORT, () => {
+            console.log(`Server running on port ${PORT}`);
+        });
+    }
 });
+
+export default app;
