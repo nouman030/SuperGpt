@@ -182,7 +182,7 @@ function ChatBox() {
                   }`}
                 >
                   <div
-                    className={`flex max-w-[95%] md:max-w-3xl gap-4 ${
+                    className={`flex max-w-[85%] md:max-w-3xl gap-2 md:gap-4 ${
                       message.role === "user" ? "flex-row-reverse" : "flex-row"
                     }`}
                   >
@@ -204,22 +204,22 @@ function ChatBox() {
                     {/* Message Bubble */}
                     <div className={`flex flex-col ${message.role === "user" ? "items-end" : "items-start"} min-w-0 max-w-full`}>
                       <div
-                        className={`px-6 py-4 shadow-sm w-full relative group-hover:shadow-md transition-shadow duration-300 ${
+                        className={`px-4 py-3 md:px-6 md:py-4 shadow-sm w-full relative group-hover:shadow-md transition-shadow duration-300 ${
                           message.role === "user"
                             ? "rounded-[2rem] rounded-tr-sm text-white bg-gradient-to-br from-blue-600 to-indigo-600"
                             : "rounded-[2rem] rounded-tl-sm text-[var(--color-text-primary)] bg-[var(--color-bg-secondary)] border border-[var(--color-border)]"
                         }`}
                       >
                         {message.isImage ? (
-                          <div className="relative group/image rounded-xl overflow-hidden bg-black/5 -m-2">
+                          <div className="relative m-0.5 group/image rounded-xl overflow-hidden bg-black/5 -m-2">
                             <img
                               src={message.content}
                               alt="Generated content"
-                              className="max-w-full h-auto object-cover cursor-pointer transition-transform duration-700 group-hover/image:scale-105"
+                              className="max-w-full h-auto  object-cover cursor-pointer transition-transform duration-700 group-hover/image:scale-105"
                               onLoad={scrollToBottom}
                               onClick={() => setSelectedImage({ imageUrl: message.content, prompt: "generated-image" })}
                             />
-                            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover/image:opacity-100 transition-opacity duration-300 flex items-center justify-center gap-3 backdrop-blur-[2px]">
+                            <div className="absolute inset-0 transition-opacity duration-300 flex gap-3 opacity-100 bg-gradient-to-t from-black/60 via-transparent to-transparent items-end justify-end p-3 md:opacity-0 md:group-hover/image:opacity-100 md:bg-black/40 md:bg-none md:items-center md:justify-center md:backdrop-blur-[2px]">
                               <button
                                 onClick={(e) => {
                                   e.stopPropagation();
@@ -308,10 +308,10 @@ function ChatBox() {
                             </ReactMarkdown>
                           </div>
                         )}
+                        <div className={`text-[10px] md:text-[11px] mt-1 md:mt-2 opacity-60 font-medium transition-opacity duration-300 ${message.role === "user" ? "text-right text-white/80" : "text-left text-[var(--color-text-secondary)]"}`}>
+                          {formatTime(message.timestamp)}
+                        </div>
                       </div>
-                      <span className={`text-[11px] mt-2 text-[var(--color-text-secondary)] opacity-60 font-medium px-2 transition-opacity duration-300 ${message.role === "user" ? "text-right" : "text-left"}`}>
-                        {formatTime(message.timestamp)}
-                      </span>
                     </div>
                   </div>
                 </div>

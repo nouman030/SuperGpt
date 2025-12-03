@@ -73,7 +73,7 @@ const Community = () => {
   }
 
   return (
-    <div className="min-h-screen bg-(--color-bg-primary) p-6">
+    <div className="h-full overflow-y-auto bg-[var(--color-bg-primary)] p-6 custom-scrollbar">
       <h1 className="text-center text-3xl font-bold mt-5 mb-8 bg-gradient-to-r from-blue-400 to-purple-600 text-transparent bg-clip-text animate-slideUp">
         Community Showcase
       </h1>
