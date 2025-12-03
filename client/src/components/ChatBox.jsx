@@ -1,24 +1,23 @@
 import React, { useContext, useState, useRef, useEffect } from "react";
 import { Appcontext } from "../contexts/Appcontext";
-import { FiSend, FiImage, FiPaperclip } from "react-icons/fi";
-import { FaDownload, FaExpand, FaTimes } from "react-icons/fa";
-import { BsRobot, BsPerson } from "react-icons/bs";
+import { FiSend, FiImage, FiPaperclip, FiMoreVertical, FiTrash2, FiCopy, FiChevronDown } from "react-icons/fi";
+import { FaDownload, FaExpand, FaTimes, FaRobot, FaUser } from "react-icons/fa";
 import logo from "../assets/logo.png";
 import { toast } from "react-hot-toast";
 import ReactMarkdown from "react-markdown";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { vscDarkPlus } from "react-syntax-highlighter/dist/esm/styles/prism";
+
 function ChatBox() {
   const { selectedChat, setSelectedChat, setChats } = useContext(Appcontext);
   const [inputValue, setInputValue] = useState("");
   const messagesEndRef = useRef(null);
-  const scrollContainerRef = useRef(null);
   const [isTyping, setIsTyping] = useState(false);
 
   const [inputMode, setInputMode] = useState("text"); // 'text' or 'image'
   const [showModeDropdown, setShowModeDropdown] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
-  const [loading, setLoading] = useState(false);
+
   const handleDownload = async (imageUrl, prompt) => {
     try {
       const response = await fetch(imageUrl);
@@ -41,17 +40,9 @@ function ChatBox() {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
-  // Auto-scroll when messages change or chat is selected
   useEffect(() => {
     scrollToBottom();
   }, [selectedChat, selectedChat?.messages, isTyping]);
-
-  // Initial scroll when component mounts or chat changes (instant)
-  useEffect(() => {
-    if (messagesEndRef.current) {
-      messagesEndRef.current.scrollIntoView({ behavior: "auto" });
-    }
-  }, [selectedChat?._id]);
 
   const handleInputChange = (e) => {
     setInputValue(e.target.value);
@@ -69,7 +60,6 @@ function ChatBox() {
         timestamp: Date.now(),
       };
 
-      // If no chat selected, create a new one
       if (!selectedChat) {
         setInputValue("");
         setIsTyping(true);
@@ -90,19 +80,10 @@ function ChatBox() {
         const data = await response.json();
 
         if (data.Success) {
-          // Update chats list and select the new chat
           setChats((prev) => [data.chat, ...prev]);
           setSelectedChat(data.chat);
           
-          // Simulate AI response
           setTimeout(async () => {
-            const aiResponse = await {
-              isImage: data.chat.messages[data.chat.messages.length - 1].isImage || false,
-              role: "assistant",
-              content: data.chat.messages[data.chat.messages.length - 1].content,
-              timestamp: Date.now(),
-            };
-
              setSelectedChat({...data.chat}); 
              setIsTyping(false);
           }, 1500);
@@ -114,7 +95,6 @@ function ChatBox() {
         return;
       }
 
-      // Existing logic for adding message to selected chat
       selectedChat.messages.push(userMessage);
       setInputValue("");
       setTimeout(scrollToBottom, 10);
@@ -170,321 +150,310 @@ function ChatBox() {
     });
   };
 
-  // Empty State Component
   const EmptyState = () => (
-    <div className="flex flex-col items-center justify-center h-full text-center p-8 animate-fadeIn">
-      <div className="w-20 h-20 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg mb-6">
-        <img src={logo} alt="SuperGpt Logo" className="w-12 h-12 object-contain" />
+    <div className="flex flex-col items-center justify-center h-full text-center p-8 animate-fadeIn select-none">
+      <div className="w-24 h-24 bg-gradient-to-br from-indigo-500/10 to-purple-600/10 rounded-[2rem] flex items-center justify-center shadow-sm mb-8 backdrop-blur-sm border border-white/20 dark:border-white/5 ring-1 ring-white/20">
+        <img src={logo} alt="SuperGpt Logo" className="w-14 h-14 object-contain opacity-90 drop-shadow-sm" />
       </div>
-      <h1 className="text-4xl md:text-5xl font-light mb-3 bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-blue-500 drop-shadow-md">
+      <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 tracking-tight">
         SuperGpt
       </h1>
-      <p className="text-xl text-[var(--color-text-secondary)] font-light">
-        Intelligent AI Assistant
+      <p className="text-lg text-[var(--color-text-secondary)] font-medium max-w-md leading-relaxed opacity-80">
+        Your intelligent AI companion for code, creativity, and conversation.
       </p>
-      <h2 className="text-3xl md:text-4xl font-semibold mt-8 text-[var(--color-text-primary)] opacity-90">
-        Ask me anything.
-      </h2>
     </div>
   );
 
   return (
-    <div 
-      className="flex flex-col h-full relative transition-colors duration-300"
-      style={{ backgroundColor: 'var(--color-bg-primary)' }}
-    >
+    <div className="flex flex-col h-full relative bg-[var(--color-bg-primary)] overflow-hidden transition-colors duration-300">
+      
       {/* Messages Area */}
-      <div 
-        ref={scrollContainerRef}
-        className="flex-1 overflow-y-auto p-4 md:p-6 space-y-8 custom-scrollbar chat-scroll pb-44"
-      >
-        {(!selectedChat?.messages || selectedChat.messages.length === 0) ? (
-          <EmptyState />
-        ) : (
-          <>
-            {selectedChat.messages.map((message, index) => (
-              <div
-                key={index}
-                className={`flex w-full animate-slideUp ${
-                  message.role === "user" ? "justify-end" : "justify-start"
-                }`}
-              >
+      <div className="flex-1 overflow-y-auto custom-scrollbar p-4 md:p-6 space-y-8 scroll-smooth pb-32 md:pb-48">
+        <div className="max-w-5xl mx-auto w-full space-y-8">
+          {(!selectedChat?.messages || selectedChat.messages.length === 0) ? (
+            <EmptyState />
+          ) : (
+            <>
+              {selectedChat.messages.map((message, index) => (
                 <div
-                  className={`flex max-w-[85%] md:max-w-2xl gap-4 ${
-                    message.role === "user" ? "flex-row-reverse" : "flex-row"
+                  key={index}
+                  className={`flex w-full animate-slideUp group ${
+                    message.role === "user" ? "justify-end" : "justify-start"
                   }`}
                 >
-                  {/* Avatar */}
                   <div
-                    className={`shrink-0 h-8 w-8 md:h-10 md:w-10 rounded-full flex items-center justify-center shadow-sm transition-transform hover:scale-110 ${
-                      message.role === "user"
-                        ? "bg-gradient-to-br from-blue-500 to-blue-600 text-white"
-                        : "bg-gradient-to-br from-indigo-500 to-purple-600 text-white"
+                    className={`flex max-w-[95%] md:max-w-3xl gap-4 ${
+                      message.role === "user" ? "flex-row-reverse" : "flex-row"
                     }`}
                   >
-                    {message.role === "user" ? (
-                      <BsPerson className="h-5 w-5 md:h-6 md:w-6" />
-                    ) : (
-                      <BsRobot className="h-5 w-5 md:h-6 md:w-6" />
-                    )}
-                  </div>
-
-                  {/* Message Bubble */}
-                  <div className="flex flex-col">
+                    {/* Avatar */}
                     <div
-                      className={`px-6 py-4 shadow-sm ${
+                      className={`shrink-0 h-10 w-10 rounded-full flex items-center justify-center shadow-sm ring-2 ring-white/10 ${
                         message.role === "user"
-                          ? "rounded-2xl rounded-tr-sm text-white"
-                          : "rounded-2xl rounded-tl-sm text-(--color-text-primary)"
+                          ? "bg-gradient-to-br from-blue-600 to-indigo-600 text-white"
+                          : "bg-gradient-to-br from-emerald-500 to-teal-600 text-white"
                       }`}
-                      style={{
-                        background: message.role === 'user' 
-                          ? 'var(--button-gradient)' 
-                          : 'var(--card-gradient)',
-                        border: message.role === 'assistant' ? '1px solid var(--color-border)' : 'none'
-                      }}
                     >
-                      {message.isImage ? (
-                        <div className="relative group overflow-hidden rounded-lg shadow-sm mb-2">
-                          <img
-                            src={message.content}
-                            alt="Chat content"
-                            className="max-w-full object-cover cursor-pointer transition-transform duration-300 group-hover:scale-105"
-                            onLoad={scrollToBottom}
-                            onClick={() => setSelectedImage({ imageUrl: message.content, prompt: "generated-image" })}
-                          />
-                          {/* Overlay */}
-                          <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center gap-4">
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setSelectedImage({ imageUrl: message.content, prompt: "generated-image" });
-                              }}
-                              className="p-2 bg-white/20 backdrop-blur-sm rounded-full text-white hover:bg-white/40 transition-colors"
-                              title="Preview"
-                            >
-                              <FaExpand />
-                            </button>
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleDownload(message.content, "generated-image");
-                              }}
-                              className="p-2 bg-white/20 backdrop-blur-sm rounded-full text-white hover:bg-white/40 transition-colors"
-                              title="Download"
-                            >
-                              <FaDownload />
-                            </button>
-                          </div>
-                        </div>
+                      {message.role === "user" ? (
+                        <FaUser className="h-4 w-4" />
                       ) : (
-                        <div className="markdown-container text-[15px] md:text-base leading-relaxed">
-                          <ReactMarkdown
-                            components={{
-                              code({ node, inline, className, children, ...props }) {
-                                const match = /language-(\w+)/.exec(className || "");
-                                return !inline && match ? (
-                                  <div className="rounded-md overflow-hidden my-2 border border-(--color-border)">
-                                    <div className="flex items-center justify-between px-4 py-1.5 bg-[#1e1e1e] border-b border-(--color-border)">
-                                      <span className="text-xs font-medium text-gray-400 lowercase">
-                                        {match[1]}
-                                      </span>
-                                      <button
-                                        onClick={() => {
-                                           navigator.clipboard.writeText(String(children).replace(/\n$/, ""));
-                                           toast.success("Copied to clipboard!");
-                                        }}
-                                        className="text-xs text-gray-400 hover:text-white transition-colors cursor-pointer"
-                                      >
-                                        Copy
-                                      </button>
-                                    </div>
-                                    <SyntaxHighlighter
-                                      style={vscDarkPlus}
-                                      language={match[1]}
-                                      PreTag="div"
-                                      customStyle={{
-                                        margin: 0,
-                                        borderRadius: "0 0 0.375rem 0.375rem",
-                                        fontSize: "0.875rem", // 14px
-                                      }}
-                                      {...props}
-                                    >
-                                      {String(children).replace(/\n$/, "")}
-                                    </SyntaxHighlighter>
-                                  </div>
-                                ) : (
-                                  <code className={`${className} bg-black/20 rounded px-1 py-0.5 text-sm`} {...props}>
-                                    {children}
-                                  </code>
-                                );
-                              },
-                              p: ({ children }) => <p className="mb-2 last:mb-0">{children}</p>,
-                              ul: ({ children }) => <ul className="list-disc ml-4 mb-2">{children}</ul>,
-                              ol: ({ children }) => <ol className="list-decimal ml-4 mb-2">{children}</ol>,
-                              li: ({ children }) => <li className="mb-1">{children}</li>,
-                              a: ({ href, children }) => (
-                                <a href={href} target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:underline">
-                                  {children}
-                                </a>
-                              ),
-                            }}
-                          >
-                            {message.content}
-                          </ReactMarkdown>
-                        </div>
+                        <FaRobot className="h-5 w-5" />
                       )}
                     </div>
-                    <span 
-                      className={`text-[11px] mt-1.5 font-medium opacity-70 ${
-                        message.role === 'user' ? 'text-right' : 'text-left'
-                      }`}
-                    >
-                      {formatTime(message.timestamp)}
-                    </span>
+
+                    {/* Message Bubble */}
+                    <div className={`flex flex-col ${message.role === "user" ? "items-end" : "items-start"} min-w-0 max-w-full`}>
+                      <div
+                        className={`px-6 py-4 shadow-sm w-full relative group-hover:shadow-md transition-shadow duration-300 ${
+                          message.role === "user"
+                            ? "rounded-[2rem] rounded-tr-sm text-white bg-gradient-to-br from-blue-600 to-indigo-600"
+                            : "rounded-[2rem] rounded-tl-sm text-[var(--color-text-primary)] bg-[var(--color-bg-secondary)] border border-[var(--color-border)]"
+                        }`}
+                      >
+                        {message.isImage ? (
+                          <div className="relative group/image rounded-xl overflow-hidden bg-black/5 -m-2">
+                            <img
+                              src={message.content}
+                              alt="Generated content"
+                              className="max-w-full h-auto object-cover cursor-pointer transition-transform duration-700 group-hover/image:scale-105"
+                              onLoad={scrollToBottom}
+                              onClick={() => setSelectedImage({ imageUrl: message.content, prompt: "generated-image" })}
+                            />
+                            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover/image:opacity-100 transition-opacity duration-300 flex items-center justify-center gap-3 backdrop-blur-[2px]">
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setSelectedImage({ imageUrl: message.content, prompt: "generated-image" });
+                                }}
+                                className="p-3 bg-white/20 backdrop-blur-md rounded-full text-white hover:bg-white/30 transition-all transform hover:scale-110 active:scale-95"
+                              >
+                                <FaExpand size={18} />
+                              </button>
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleDownload(message.content, "generated-image");
+                                }}
+                                className="p-3 bg-white/20 backdrop-blur-md rounded-full text-white hover:bg-white/30 transition-all transform hover:scale-110 active:scale-95"
+                              >
+                                <FaDownload size={18} />
+                              </button>
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="prose prose-invert max-w-none text-[15px] md:text-[16px] leading-7 break-words min-w-0">
+                            <ReactMarkdown
+                              components={{
+                                code({ node, inline, className, children, ...props }) {
+                                  const match = /language-(\w+)/.exec(className || "");
+                                  return !inline && match ? (
+                                    <div className="rounded-xl overflow-hidden my-4 border border-[var(--color-border)] bg-[#1e1e1e] shadow-lg w-full max-w-full group/code">
+                                      <div className="flex items-center justify-between px-4 py-2.5 bg-[#2d2d2d] border-b border-[#404040]">
+                                        <div className="flex items-center gap-2">
+                                          <div className="flex gap-1.5">
+                                            <div className="w-2.5 h-2.5 rounded-full bg-[#ff5f56]"></div>
+                                            <div className="w-2.5 h-2.5 rounded-full bg-[#ffbd2e]"></div>
+                                            <div className="w-2.5 h-2.5 rounded-full bg-[#27c93f]"></div>
+                                          </div>
+                                          <span className="text-xs font-mono text-gray-400 lowercase ml-2">
+                                            {match[1]}
+                                          </span>
+                                        </div>
+                                        <button
+                                          onClick={() => {
+                                             navigator.clipboard.writeText(String(children).replace(/\n$/, ""));
+                                             toast.success("Copied!");
+                                          }}
+                                          className="flex items-center gap-1.5 text-xs text-gray-400 hover:text-white transition-colors bg-white/5 px-2 py-1 rounded-md hover:bg-white/10"
+                                        >
+                                          <FiCopy /> Copy
+                                        </button>
+                                      </div>
+                                      <div className="overflow-x-auto w-full">
+                                        <SyntaxHighlighter
+                                          style={vscDarkPlus}
+                                          language={match[1]}
+                                          PreTag="div"
+                                          customStyle={{
+                                            margin: 0,
+                                            padding: '1.5rem',
+                                            background: 'transparent',
+                                            fontSize: '0.9rem',
+                                            lineHeight: '1.5',
+                                          }}
+                                          {...props}
+                                        >
+                                          {String(children).replace(/\n$/, "")}
+                                        </SyntaxHighlighter>
+                                      </div>
+                                    </div>
+                                  ) : (
+                                    <code className={`${className} bg-black/10 dark:bg-white/10 rounded-md px-1.5 py-0.5 text-[0.9em] font-mono break-all border border-black/5 dark:border-white/5`} {...props}>
+                                      {children}
+                                    </code>
+                                  );
+                                },
+                                a: ({ href, children }) => (
+                                  <a href={href} target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:text-blue-300 underline decoration-blue-400/30 underline-offset-4 break-all transition-colors">
+                                    {children}
+                                  </a>
+                                ),
+                                p: ({ children }) => <p className="mb-2 last:mb-0 break-words">{children}</p>,
+                                ul: ({ children }) => <ul className="list-disc ml-5 mb-2 space-y-1 marker:text-[var(--color-text-secondary)]">{children}</ul>,
+                                ol: ({ children }) => <ol className="list-decimal ml-5 mb-2 space-y-1 marker:text-[var(--color-text-secondary)]">{children}</ol>,
+                                blockquote: ({ children }) => <blockquote className="border-l-4 border-indigo-500/50 pl-4 italic my-2 text-[var(--color-text-secondary)]">{children}</blockquote>,
+                              }}
+                            >
+                              {message.content}
+                            </ReactMarkdown>
+                          </div>
+                        )}
+                      </div>
+                      <span className={`text-[11px] mt-2 text-[var(--color-text-secondary)] opacity-60 font-medium px-2 transition-opacity duration-300 ${message.role === "user" ? "text-right" : "text-left"}`}>
+                        {formatTime(message.timestamp)}
+                      </span>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              ))}
 
-            {/* Typing Indicator */}
-            {isTyping && (
-              <div className="flex justify-start animate-fadeIn">
-                <div className="flex items-center gap-4 max-w-2xl">
-                   <div className="shrink-0 h-10 w-10 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white shadow-sm">
-                      <BsRobot className="h-6 w-6" />
-                   </div>
-                   <div 
-                     className="px-6 py-5 rounded-2xl rounded-tl-sm shadow-sm"
-                     style={{ background: 'var(--card-gradient)', border: '1px solid var(--color-border)' }}
-                   >
-                    <div className="flex items-center space-x-1.5">
-                      <div className="w-2 h-2 bg-indigo-400 rounded-full animate-bounce" style={{ animationDelay: "0ms" }}></div>
-                      <div className="w-2 h-2 bg-purple-400 rounded-full animate-bounce" style={{ animationDelay: "150ms" }}></div>
-                      <div className="w-2 h-2 bg-indigo-400 rounded-full animate-bounce" style={{ animationDelay: "300ms" }}></div>
-                    </div>
-                   </div>
+              {isTyping && (
+                <div className="flex justify-start animate-fadeIn w-full">
+                  <div className="flex items-center gap-4 max-w-3xl">
+                     <div className="shrink-0 h-10 w-10 rounded-full bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center text-white shadow-sm ring-2 ring-white/10">
+                        <FaRobot className="h-5 w-5" />
+                     </div>
+                     <div className="px-6 py-5 rounded-[2rem] rounded-tl-sm bg-[var(--color-bg-secondary)] border border-[var(--color-border)] shadow-sm">
+                      <div className="flex items-center space-x-1.5">
+                        <div className="w-2 h-2 bg-emerald-400 rounded-full animate-bounce" style={{ animationDelay: "0ms" }}></div>
+                        <div className="w-2 h-2 bg-teal-400 rounded-full animate-bounce" style={{ animationDelay: "150ms" }}></div>
+                        <div className="w-2 h-2 bg-emerald-400 rounded-full animate-bounce" style={{ animationDelay: "300ms" }}></div>
+                      </div>
+                     </div>
+                  </div>
                 </div>
-              </div>
-            )}
-            
-            {/* Spacer to prevent input overlap */}
-            <div className="h-32 md:h-40 shrink-0" />
-            <div ref={messagesEndRef} />
-          </>
-        )}
+              )}
+              <div ref={messagesEndRef} className="h-4" />
+            </>
+          )}
+        </div>
       </div>
 
-      {/* Floating Input Area */}
-      <div className="absolute bottom-0 left-0 right-0 z-10 p-4 md:p-6 bg-gradient-to-t from-[var(--color-bg-primary)] via-[var(--color-bg-primary)] to-transparent">
-        <div className="max-w-4xl mx-auto">
+      {/* Input Area - Floating Pill Design */}
+      <div className="absolute bottom-0 left-0 right-0 p-4 md:p-6 bg-gradient-to-t from-[var(--color-bg-primary)] via-[var(--color-bg-primary)]/90 to-transparent pointer-events-none">
+        <div className="max-w-4xl mx-auto pointer-events-auto w-full">
           <form 
             onSubmit={handleSubmit} 
-            className="flex items-center gap-2 pl-4 pr-2 py-2 rounded-full shadow-lg border backdrop-blur-md transition-all duration-300 focus-within:shadow-xl focus-within:border-[var(--color-accent)]"
-            style={{ 
-              backgroundColor: 'var(--color-bg-secondary)',
-              borderColor: 'var(--color-border)'
-            }}
+            className="flex items-end gap-1 md:gap-2 p-1.5 md:p-2 rounded-[2rem] bg-[var(--color-bg-secondary)]/80 backdrop-blur-xl border border-[var(--color-border)] shadow-lg hover:shadow-xl focus-within:shadow-2xl focus-within:border-indigo-500/30 focus-within:bg-[var(--color-bg-secondary)] transition-all duration-300 ease-out"
           >
-            {/* Mode Dropdown */}
-            <div className="relative">
-              <div 
-                className="hidden md:flex items-center gap-1 pr-4 border-r border-(--color-border) text-(--color-text-secondary) cursor-pointer hover:text-(--color-text-primary) transition-colors"
+            {/* Mode Selector */}
+            <div className="relative self-center ml-1 md:ml-2">
+              <button
+                type="button"
                 onClick={() => setShowModeDropdown(!showModeDropdown)}
+                className={`px-2 md:px-4 py-2.5 rounded-full transition-all duration-200 flex items-center gap-2 font-medium text-sm ${
+                  inputMode === 'image' 
+                    ? 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400' 
+                    : 'bg-[var(--color-bg-tertiary)]/50 hover:bg-[var(--color-bg-tertiary)] text-[var(--color-text-primary)]'
+                }`}
+                title="Switch mode"
               >
-                <span className="text-sm font-medium capitalize min-w-[40px]">{inputMode}</span>
-                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
-                
-                {/* Dropdown Menu */}
-                {showModeDropdown && (
-                  <div className="absolute bottom-full left-0 mb-2 w-32 bg-(--color-bg-secondary) border border-(--color-border) rounded-xl shadow-xl overflow-hidden z-50 animate-fadeIn">
-                    <div 
-                      className={`px-4 py-2 text-sm hover:bg-(--color-bg-tertiary) cursor-pointer flex items-center gap-2 ${inputMode === 'text' ? 'text-(--color-accent)' : ''}`}
-                      onClick={() => { setInputMode('text'); setShowModeDropdown(false); }}
-                    >
-                      <BsPerson className="w-4 h-4" /> Text
-                    </div>
-                    <div 
-                      className={`px-4 py-2 text-sm hover:bg-(--color-bg-tertiary) cursor-pointer flex items-center gap-2 ${inputMode === 'image' ? 'text-(--color-accent)' : ''}`}
-                      onClick={() => { setInputMode('image'); setShowModeDropdown(false); }}
-                    >
-                      <FiImage className="w-4 h-4" /> Image
+                {inputMode === 'image' ? (
+                  <>
+                    <FiImage size={16} />
+                    <span className="hidden md:inline">Image</span>
+                  </>
+                ) : (
+                  <>
+                    <FaUser size={14} />
+                    <span className="hidden md:inline">Text</span>
+                  </>
+                )}
+                <FiChevronDown size={14} className={`transition-transform duration-200 ${showModeDropdown ? 'rotate-180' : ''}`} />
+              </button>
+              
+              {showModeDropdown && (
+                <>
+                  <div className="fixed inset-0 z-10" onClick={() => setShowModeDropdown(false)} />
+                  <div className="absolute bottom-full left-0 mb-4 w-48 bg-[var(--color-bg-secondary)] border border-[var(--color-border)] rounded-2xl shadow-2xl overflow-hidden z-20 animate-fadeIn origin-bottom-left">
+                    <div className="p-1.5 space-y-0.5">
+                      <button
+                        type="button"
+                        className={`w-full px-4 py-3 text-sm text-left rounded-xl flex items-center gap-3 transition-all ${inputMode === 'text' ? 'bg-indigo-50 text-indigo-600 dark:bg-indigo-900/20 dark:text-indigo-400 font-medium' : 'text-[var(--color-text-primary)] hover:bg-[var(--color-bg-tertiary)]'}`}
+                        onClick={() => { setInputMode('text'); setShowModeDropdown(false); }}
+                      >
+                        <FaUser className="w-4 h-4" /> Text Chat
+                      </button>
+                      <button
+                        type="button"
+                        className={`w-full px-4 py-3 text-sm text-left rounded-xl flex items-center gap-3 transition-all ${inputMode === 'image' ? 'bg-purple-50 text-purple-700 dark:bg-purple-900/20 dark:text-purple-400 font-medium' : 'text-[var(--color-text-primary)] hover:bg-[var(--color-bg-tertiary)]'}`}
+                        onClick={() => { setInputMode('image'); setShowModeDropdown(false); }}
+                      >
+                        <FiImage className="w-4 h-4" /> Generate Image
+                      </button>
                     </div>
                   </div>
-                )}
-              </div>
+                </>
+              )}
             </div>
 
             <input
               type="text"
               value={inputValue}
               onChange={handleInputChange}
-              placeholder={inputMode === 'image' ? "Describe the image you want to generate..." : "Type your prompt here..."}
-              className="flex-1 bg-transparent text-(--color-text-primary) placeholder-gray-400 focus:outline-none text-base py-2 pl-2"
+              placeholder={inputMode === 'image' ? "Describe the image you want to generate..." : "Message SuperGpt..."}
+              className="flex-1 min-w-0 bg-transparent text-[var(--color-text-primary)] placeholder-gray-400 focus:outline-none text-[16px] py-3.5 px-2 max-h-32 overflow-y-auto"
+              autoComplete="off"
             />
             
-            <div className="flex items-center gap-1">
-              <button
-                type="button"
-                className="p-2 rounded-full hover:bg-(--color-bg-tertiary) text-(--color-text-secondary) transition-colors"
-                title="Attach file"
-              >
-                <FiPaperclip className="h-5 w-5" />
-              </button>
-              
+            <div className="flex items-center gap-1 self-center mr-1">
               <button
                 type="submit"
                 disabled={!inputValue.trim()}
-                className={`p-3 rounded-full shadow-md transform transition-all duration-200 ml-1 ${
+                className={`p-3.5 rounded-full shadow-sm transition-all duration-300 transform ${
                   inputValue.trim()
-                    ? "hover:scale-105 active:scale-95"
-                    : "opacity-50 cursor-not-allowed"
+                    ? "bg-gradient-to-r from-indigo-600 to-purple-600 text-white hover:shadow-lg hover:scale-105 active:scale-95 rotate-0"
+                    : "bg-[var(--color-bg-tertiary)] text-gray-400 cursor-not-allowed rotate-45 opacity-50"
                 }`}
-                style={{ 
-                  background: 'var(--button-gradient)',
-                  color: 'var(--color-button-text)'
-                }}
-                title="Send message"
               >
-                <FiSend className="h-5 w-5" />
+                <FiSend className={`w-5 h-5 ${inputValue.trim() ? 'ml-0.5' : ''}`} />
               </button>
             </div>
           </form>
-          <div className="text-center mt-2">
-             <p className="text-[10px] text-[var(--color-text-secondary)] opacity-60">
-               SuperGpt can make mistakes. Consider checking important information.
-             </p>
-          </div>
+          <p className="text-center text-[10px] md:text-xs text-[var(--color-text-secondary)] mt-3 opacity-50 font-medium tracking-wide">
+            SuperGpt can make mistakes. Consider checking important information.
+          </p>
         </div>
       </div>
+
       {/* Image Preview Modal */}
       {selectedImage && (
         <div 
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-4 backdrop-blur-sm animate-fadeIn"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-4 backdrop-blur-xl animate-fadeIn"
           onClick={() => setSelectedImage(null)}
         >
           <button
-            className="absolute top-4 right-4 text-white/70 hover:text-white text-3xl transition-colors cursor-pointer z-50"
+            className="absolute top-6 right-6 p-3 rounded-full bg-white/10 text-white/70 hover:text-white hover:bg-white/20 transition-all z-50 hover:rotate-90 duration-300"
             onClick={() => setSelectedImage(null)}
           >
-            <FaTimes />
+            <FaTimes size={24} />
           </button>
           
           <div 
-            className="relative max-w-5xl max-h-[90vh] w-full flex flex-col items-center"
+            className="relative max-w-7xl w-full h-full flex flex-col items-center justify-center"
             onClick={(e) => e.stopPropagation()}
           >
             <img
               src={selectedImage.imageUrl}
               alt="Preview"
-              className="max-w-full max-h-[80vh] object-contain rounded-lg shadow-2xl"
+              className="max-w-full max-h-[85vh] object-contain rounded-2xl shadow-2xl ring-1 ring-white/10"
             />
-            <div className="mt-4 flex items-center gap-4">
+            <div className="mt-8 flex items-center gap-4 animate-slideUp">
               <button
                 onClick={() => handleDownload(selectedImage.imageUrl, selectedImage.prompt)}
-                className="flex items-center gap-2 px-4 py-2 bg-(--color-accent) text-white rounded-lg hover:bg-(--color-accent-hover) transition-colors cursor-pointer"
+                className="flex items-center gap-2 px-8 py-3 bg-white text-black rounded-full font-semibold hover:bg-gray-100 transition-all shadow-[0_0_20px_rgba(255,255,255,0.3)] hover:shadow-[0_0_30px_rgba(255,255,255,0.5)] active:scale-95 transform hover:-translate-y-1"
               >
-                <FaDownload /> Download
+                <FaDownload /> Download High Quality
               </button>
             </div>
           </div>
@@ -495,4 +464,3 @@ function ChatBox() {
 }
 
 export default ChatBox;
-
