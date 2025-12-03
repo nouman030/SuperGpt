@@ -36,7 +36,7 @@ const Form = () => {
           setSuccessMessage('Registration successful! Redirecting...');
           
           // Optional: Redirect after a delay
-          setTimeout(() => window.location.href = '/login', 2000);
+          setTimeout(() => window.location.href = '/log-in', 2000);
         } else {
           setApiError(data.message || 'Registration failed');
         }
