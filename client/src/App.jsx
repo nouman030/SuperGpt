@@ -56,6 +56,7 @@ function App() {
               <Route path="/" element={<Login />} />
               <Route path="/sign-up" element={<SignUp />} />
               <Route path="/log-in" element={<Login />} />
+              <Route path="/login" element={<Login />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
             </div>
