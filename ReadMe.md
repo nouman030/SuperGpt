@@ -2,6 +2,12 @@
 
 SuperGpt is a modern, full-stack AI chat application designed to provide a seamless and interactive user experience. It features a robust chat interface, community showcase, and secure authentication, powered by advanced AI models.
 
+demo: https://super-gpt-one.vercel.app/
+
+
+server Api : https://super-gpt-server.vercel.app/
+
+
 ## 🚀 Features
 
 - **AI Chat Interface**: Interact with advanced AI models for text generation.
